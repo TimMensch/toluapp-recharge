@@ -21,8 +21,6 @@ local function pp_dofile(path)
 
 			size = file:seek("end",0);
 
-			print("read "..path..", a "..size.." byte file");
-
 			file:close()
 
 			ret = string.gsub(ret, "%.%.%.%s*%)", "...) local arg = {n=select('#', ...), ...};")
