@@ -182,7 +182,24 @@ static int class_index_event (lua_State* L)
 			}
 			else
 			{
-			 lua_pushvalue(L,2);                    /* stack: obj key mt key */
+				lua_pushstring(L,".arrow");			/* stack: obj key mt '.arrow' */
+				lua_rawget(L,-2);                   /* stack: obj key mt arrow_fn/nil */
+				if (lua_iscfunction(L,-1))			
+				{
+					lua_remove(L,-2);               /* stack: obj key arrow_fn/nil */
+					lua_pushvalue(L,1);				/* stack: obj key arrow_fn/nil obj */
+					lua_call(L,1,1);				/* stack: obj key newobj/nil */
+					if (lua_isuserdata(L,-1))
+					{
+						lua_remove(L,1);				/* stack: key newobj */
+						lua_insert(L,1);				/* stack: newobj key */
+						lua_pushvalue(L,1);				/* stack: newobj key newobj */
+						continue;
+					}
+				}
+				lua_pop(L,1);                           /* stack: t k v mt */
+
+				lua_pushvalue(L,2);                    /* stack: obj key mt key */
 				lua_rawget(L,-2);                      /* stack: obj key mt value */
 				if (!lua_isnil(L,-1))
 					return 1;
@@ -264,6 +281,23 @@ static int class_newindex_event (lua_State* L)
 			}
 			else
 			{
+				lua_pushstring(L,".arrow");			/* stack: obj key v mt '.arrow' */
+				lua_rawget(L,-2);                   /* stack: obj key v mt arrow_fn/nil */
+				if (lua_iscfunction(L,-1))			
+				{
+					lua_remove(L,-2);               /* stack: obj key v arrow_fn/nil */
+					lua_pushvalue(L,1);				/* stack: obj key v arrow_fn/nil obj */
+					lua_call(L,1,1);				/* stack: obj key v newobj */
+					if (lua_isuserdata(L,-1))
+					{
+						lua_remove(L,1);				/* stack: key v newobj */
+						lua_insert(L,1);				/* stack: newobj key v */
+						lua_getmetatable(L,1);			/* stack: newobj key v mt */
+						continue;
+					}
+				}
+				lua_pop(L,1);                           /* stack: t k v mt */
+
 				lua_pushstring(L,".set");
 				lua_rawget(L,-2);                      /* stack: t k v mt tset */
 				if (lua_istable(L,-1))
