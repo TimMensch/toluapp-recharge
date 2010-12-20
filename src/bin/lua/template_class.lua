@@ -51,6 +51,11 @@ function classTemplateClass:throw(types, local_scope)
 		end
 
 		Class(n..append, pI, bI)
+
+		if n:find("shared_ptr") then
+			_shared_ptr[Il[1]] = true
+		end
+
 	end
 end
 

@@ -54,6 +54,9 @@ _usertype = {}
 -- List of types that have to be collected
 _collect = {}
 
+-- List of types that are always wrapped in a shared_ptr
+_shared_ptr = {}
+
 -- List of types
 _global_types = {n=0}
 _global_types_hash = {}

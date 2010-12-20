@@ -99,7 +99,12 @@ function classFunction:supcode (local_constructor)
 		if self.const ~= '' then
 			type = "const "..type
 		end
-		output('     !'..func..'(tolua_S,1,"'..type..'",0,&tolua_err) ||\n')
+		if _shared_ptr[class] and not static then
+			output('     !'..func..'(tolua_S,1,"shared_ptr<'..type..'>",0,&tolua_err) ||\n')
+		else
+			output('     !'..func..'(tolua_S,1,"'..type..'",0,&tolua_err) ||\n')
+		end
+
  end
  -- check args
  if self.args[1].type ~= 'void' then
@@ -129,10 +134,20 @@ function classFunction:supcode (local_constructor)
  local narg
  if class then narg=2 else narg=1 end
  if class and self.name~='new' and static==nil then
-  output(' ',self.const,self.parent.type,'*','self = ')
-  output('(',self.const,self.parent.type,'*) ')
-  local to_func = get_to_function(self.parent.type)
-  output(to_func,'(tolua_S,1,0);')
+
+	if _shared_ptr[class] then
+		output(' ',self.const,self.parent.type,'*','self = ')
+
+		output('( *( shared_ptr<',self.const,self.parent.type,'> *) ')
+		local to_func = get_to_function(self.parent.type)
+		output(to_func,'(tolua_S,1,0) ).get();')
+	else
+
+		output(' ',self.const,self.parent.type,'*','self = ')
+		output('(',self.const,self.parent.type,'*) ')
+		local to_func = get_to_function(self.parent.type)
+		output(to_func,'(tolua_S,1,0);')
+	end
  elseif static then
   _,_,self.mod = strfind(self.mod,'^%s*static%s%s*(.*)')
  end
