@@ -186,8 +186,8 @@ static int class_index_event (lua_State* L)
 				lua_rawget(L,-2);                   /* stack: obj key mt arrow_fn/nil */
 				if (lua_iscfunction(L,-1))			
 				{
-					lua_remove(L,-2);               /* stack: obj key arrow_fn/nil */
-					lua_pushvalue(L,1);				/* stack: obj key arrow_fn/nil obj */
+					lua_remove(L,-2);               /* stack: obj key arrow_fn */
+					lua_pushvalue(L,1);				/* stack: obj key arrow_fn obj */
 					lua_call(L,1,1);				/* stack: obj key newobj/nil */
 					if (lua_isuserdata(L,-1))
 					{
