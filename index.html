@@ -52,7 +52,26 @@
       A fork of the tolua++ source adding operator->().
     </div>
 
-    <p>This repository is primarily a copy of the tolua++ source available <a href='http://www.codenix.com/~tolua/'>here</a>, updated to work with Visual Studio 2010, and with a patch that allows operator->() to work correctly.</p>
+    <p>This repository is primarily a copy of the tolua++ source available <a href='http://www.codenix.com/~tolua/'>here</a>, 
+    updated to work with Visual Studio 2010, and with a patch that allows operator->() to work <b>ONLY UNDER VERY SPECIFIC CIRCUMSTANCE</b>. </p>
+    <p>The patch does not work for foo:bar() function calls in the general case, though there is a hack to allow it to support classes that are
+    always stored in boost::shared_ptr&lt;&gt; containers. </p>
+    <p>The patch replaces foo in foo.x with the result of operator->() before looking up x. And foo:bar() finds bar correctly, but then calls 
+    bar with a new copy of foo as self, when it expects the result of operator->() instead. But if the code is wrapped in a shared_ptr template,
+    it will instead "properly" match (and dereference) the shared_ptr self object.</p>
+    <p>Usage is like this:</p>
+<tt>
+class shared_ptr // the name MUST match to trigger my hack
+{
+	TOLUA_TEMPLATE_BIND(T, Class1, Class2, ... ) ; // this seems to need to be on one line due to a tolua++ bug.
+	T * operator->();
+};
+</tt>
+    <p>This must be declared to tolua++ before you declare Class1 etc. With this patch, ALL classes must only be held in a
+    shared_ptr&lt;&gt; container, or Bad Things will happen. Additionally, I make sure NOT to expose constructor or destructor
+    for any of the classes to be so wrapped -- instead you should define a "create" factory that returns the class already
+    wrapped in a smart pointer</p>
+
     <p>The "recharge" tag refers to my mobile game development company, <a href="http://rechargegames.com">Recharge Games</a>.</p><h2>Install</h2>
 <p>See http://www.codenix.com/~tolua/</p>
 <h2>License</h2>
