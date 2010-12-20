@@ -82,18 +82,19 @@ class shared_ptr // the name MUST match to trigger my hack<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;T * operator->();<br/>
 };<br/>
 </code>
-    <p>This must be declared to tolua++ before you declare Class1 etc. With this patch, ALL classes must only be held in a
-    shared_ptr&lt;&gt; container, or Bad Things will happen. Additionally, I make sure NOT to expose constructor or destructor
-    for any of the classes to be so wrapped -- instead you should define a "create" factory that returns the class already
-    wrapped in a smart pointer. If you're wrapping a class in a smart pointer, Lua should never delete it or create it.
-    And with this patch, Lua should never be handed a raw pointer to one of the classes you mark with the above template, 
+    <p>This must be declared to tolua++ before you declare Class1 etc. With this patch, ALL classes listed in TOLUA_TEMPLATE_BIND for
+    shared_ptr&lt;&gt; must only be held in a shared_ptr&lt;&gt; container, or Bad Things will happen. Additionally, I make sure NOT 
+    to expose constructor or destructor for any of the classes to be so wrapped -- instead you should define a "create" factory that 
+    returns the class already wrapped in a smart pointer. If you're wrapping a class in a smart pointer, Lua should never delete it 
+    or create it. And with this patch, Lua should never be handed a raw pointer to one of the classes you pass to the above template, 
     or it will fail.</p>
 
     <p>As one more minor feature of this patch, there's a shell script in the main folder that will regenerate the tolua++ sources
     from the included Lua files; in other words you'll be able to rebuild without installing SCons, which gave me no end of pain.</p>
 
     <p>The "recharge" tag refers to my mobile game development company, <a href="http://rechargegames.com">Recharge Games</a>.</p><h2>Install</h2>
-<p>See <a href='http://www.codenix.com/~tolua/'>http://www.codenix.com/~tolua/</a></p>
+<p>See <a href='http://www.codenix.com/~tolua/'>http://www.codenix.com/~tolua/</a> for full information; this is just a minor patch
+    to the project.</p>
 <h2>License</h2>
 <p>tolua++ is released under an MIT license: http://www.codenix.com/~tolua/COPYRIGHT
 <br/><br/>
