@@ -522,14 +522,18 @@ TOLUA_API void tolua_cclass (lua_State* L, const char* lname, const char* name, 
 {
 	char cname[128] = "const ";
 	char cbase[128] = "const ";
+
 	strncat(cname,name,120);
 	strncat(cbase,base,120);
 
 	mapinheritance(L,name,base);
 	mapinheritance(L,cname,name);
 
-	mapsuper(L,cname,cbase);
-	mapsuper(L,name,base);
+	if (base[0])
+	{
+		mapsuper(L,cname,cbase);
+		mapsuper(L,name,base);
+	}
 
 	lua_pushstring(L,lname);
 	
