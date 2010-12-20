@@ -29,6 +29,20 @@
 		pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
+   code {
+	display:block;
+	font: 1em 'Courier New', Courier, Fixed, monospace;
+	font-size : 75%;
+	color: #000;
+	background : #fff no-repeat left top;
+	overflow : auto;
+	text-align:left;
+	border : 1px solid #5581C0;
+	padding : 0px 20px 0 30px;
+	margin:1em 0 1em 0;
+	line-height:17px;
+	font-weight:normal!important;
+	}
 	</style>
 	
 </head>
@@ -53,27 +67,33 @@
     </div>
 
     <p>This repository is primarily a copy of the tolua++ source available <a href='http://www.codenix.com/~tolua/'>here</a>, 
-    updated to work with Visual Studio 2010, and with a patch that allows operator->() to work <b>ONLY UNDER VERY SPECIFIC CIRCUMSTANCE</b>. </p>
+    updated to work with Visual Studio 2010, and with a patch that allows operator->() to work <b>ONLY UNDER A VERY SPECIFIC CIRCUMSTANCE</b>. </p>
     <p>The patch does not work for foo:bar() function calls in the general case, though there is a hack to allow it to support classes that are
     always stored in boost::shared_ptr&lt;&gt; containers. </p>
     <p>The patch replaces foo in foo.x with the result of operator->() before looking up x. And foo:bar() finds bar correctly, but then calls 
     bar with a new copy of foo as self, when it expects the result of operator->() instead. But if the code is wrapped in a shared_ptr template,
     it will instead "properly" match (and dereference) the shared_ptr self object.</p>
     <p>Usage is like this:</p>
-<tt>
-class shared_ptr // the name MUST match to trigger my hack
-{
-	TOLUA_TEMPLATE_BIND(T, Class1, Class2, ... ) ; // this seems to need to be on one line due to a tolua++ bug.
-	T * operator->();
-};
-</tt>
+<code>
+class shared_ptr // the name MUST match to trigger my hack<br/>
+{<br/>
+// this seems to need to be on one line due to a tolua++ bug.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;TOLUA_TEMPLATE_BIND(T, Class1, Class2, ... ) ; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;T * operator->();<br/>
+};<br/>
+</code>
     <p>This must be declared to tolua++ before you declare Class1 etc. With this patch, ALL classes must only be held in a
     shared_ptr&lt;&gt; container, or Bad Things will happen. Additionally, I make sure NOT to expose constructor or destructor
     for any of the classes to be so wrapped -- instead you should define a "create" factory that returns the class already
-    wrapped in a smart pointer</p>
+    wrapped in a smart pointer. If you're wrapping a class in a smart pointer, Lua should never delete it or create it.
+    And with this patch, Lua should never be handed a raw pointer to one of the classes you mark with the above template, 
+    or it will fail.</p>
+
+    <p>As one more minor feature of this patch, there's a shell script in the main folder that will regenerate the tolua++ sources
+    from the included Lua files; in other words you'll be able to rebuild without installing SCons, which gave me no end of pain.</p>
 
     <p>The "recharge" tag refers to my mobile game development company, <a href="http://rechargegames.com">Recharge Games</a>.</p><h2>Install</h2>
-<p>See http://www.codenix.com/~tolua/</p>
+<p>See <a href='http://www.codenix.com/~tolua/'>http://www.codenix.com/~tolua/</a></p>
 <h2>License</h2>
 <p>tolua++ is released under an MIT license: http://www.codenix.com/~tolua/COPYRIGHT
 <br/><br/>
