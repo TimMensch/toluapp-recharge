@@ -130,44 +130,56 @@ static int module_newindex_event (lua_State* L)
 	return 0;
 }
 
+static int checkAlternate( lua_State* L )
+{
+	/* Access alternative table */
+	#ifdef LUA_VERSION_NUM /* new macro on version 5.1 */
+	lua_getfenv(L,1);
+	if (!lua_rawequal(L, -1, TOLUA_NOPEER)) {
+		lua_pushvalue(L, 2); /* key */
+		lua_gettable(L, -2); /* on lua 5.1, we trade the "tolua_peers" lookup for a gettable call */
+		if (!lua_isnil(L, -1))
+			return 1;
+	};
+	#else
+	lua_pushstring(L,"tolua_peers");
+	lua_rawget(L,LUA_REGISTRYINDEX);        /* stack: obj key ubox */
+	lua_pushvalue(L,1);
+	lua_rawget(L,-2);                       /* stack: obj key ubox ubox[u] */
+	if (lua_istable(L,-1))
+	{
+		lua_pushvalue(L,2);  /* key */
+		lua_rawget(L,-2);                      /* stack: obj key ubox ubox[u] value */
+		if (!lua_isnil(L,-1))
+			return 1;
+	}
+	#endif
+	return 0;
+}
+
 /* Class index function
 	* If the object is a userdata (ie, an object), it searches the field in
 	* the alternative table stored in the corresponding "ubox" table.
 */
 static int class_index_event (lua_State* L)
 {
- int t = lua_type(L,1);
+	int followedArrow = 0;
+	int t = lua_type(L,1);
+	int keyIsNumber = lua_isnumber(L,2); // optimization: Key is invariant
+
 	if (t == LUA_TUSERDATA)
 	{
-		/* Access alternative table */
-		#ifdef LUA_VERSION_NUM /* new macro on version 5.1 */
-		lua_getfenv(L,1);
-		if (!lua_rawequal(L, -1, TOLUA_NOPEER)) {
-			lua_pushvalue(L, 2); /* key */
-			lua_gettable(L, -2); /* on lua 5.1, we trade the "tolua_peers" lookup for a gettable call */
-			if (!lua_isnil(L, -1))
-				return 1;
-		};
-		#else
-		lua_pushstring(L,"tolua_peers");
-		lua_rawget(L,LUA_REGISTRYINDEX);        /* stack: obj key ubox */
-		lua_pushvalue(L,1);
-		lua_rawget(L,-2);                       /* stack: obj key ubox ubox[u] */
-		if (lua_istable(L,-1))
+		if (checkAlternate(L))
 		{
-			lua_pushvalue(L,2);  /* key */
-			lua_rawget(L,-2);                      /* stack: obj key ubox ubox[u] value */
-			if (!lua_isnil(L,-1))
-				return 1;
+			return 1;
 		}
-		#endif
 		lua_settop(L,2);                        /* stack: obj key */
 		/* Try metatables */
 		lua_pushvalue(L,1);                     /* stack: obj key obj */
 		while (lua_getmetatable(L,-1))
 		{                                       /* stack: obj key obj mt */
 			lua_remove(L,-2);                      /* stack: obj key mt */
-			if (lua_isnumber(L,2))                 /* check if key is a numeric value */
+			if (keyIsNumber)					/* is key a numeric value? */
 			{
 				/* try operator[] */
 				lua_pushstring(L,".geti");
@@ -182,22 +194,30 @@ static int class_index_event (lua_State* L)
 			}
 			else
 			{
-				lua_pushstring(L,".arrow");			/* stack: obj key mt '.arrow' */
-				lua_rawget(L,-2);                   /* stack: obj key mt arrow_fn/nil */
-				if (lua_iscfunction(L,-1))			
+				if (!followedArrow)
 				{
-					lua_remove(L,-2);               /* stack: obj key arrow_fn */
-					lua_pushvalue(L,1);				/* stack: obj key arrow_fn obj */
-					lua_call(L,1,1);				/* stack: obj key newobj/nil */
-					if (lua_isuserdata(L,-1))
+					followedArrow = 1; // only test the arrow the first time through
+					lua_pushstring(L,".arrow");			/* stack: obj key mt '.arrow' */
+					lua_rawget(L,-2);                   /* stack: obj key mt arrow_fn/nil */
+					if (lua_iscfunction(L,-1))			
 					{
-						lua_remove(L,1);				/* stack: key newobj */
-						lua_insert(L,1);				/* stack: newobj key */
-						lua_pushvalue(L,1);				/* stack: newobj key newobj */
-						continue;
+						lua_remove(L,-2);               /* stack: obj key arrow_fn */
+						lua_pushvalue(L,1);				/* stack: obj key arrow_fn obj */
+						lua_call(L,1,1);				/* stack: obj key newobj/nil */
+						if (lua_isuserdata(L,-1))
+						{
+							lua_remove(L,1);				/* stack: key newobj */
+							lua_insert(L,1);				/* stack: newobj key */
+							if (checkAlternate(L))
+							{
+								return 1;
+							}
+							lua_pushvalue(L,1);				/* stack: newobj key newobj */
+							continue;
+						}
 					}
+					lua_pop(L,1);                           /* stack: t k v mt */
 				}
-				lua_pop(L,1);                           /* stack: t k v mt */
 
 				lua_pushvalue(L,2);                    /* stack: obj key mt key */
 				lua_rawget(L,-2);                      /* stack: obj key mt value */
@@ -258,14 +278,17 @@ static int class_index_event (lua_State* L)
 */
 static int class_newindex_event (lua_State* L)
 {
- int t = lua_type(L,1);
+	int t = lua_type(L,1);
+	int followedArrow = 0;
+	int keyIsNumber = lua_isnumber(L,2);
+
 	if (t == LUA_TUSERDATA)
 	{
 	 /* Try accessing a C/C++ variable to be set */
 		lua_getmetatable(L,1);
 		while (lua_istable(L,-1))                /* stack: t k v mt */
 		{
-			if (lua_isnumber(L,2))                 /* check if key is a numeric value */
+			if (keyIsNumber)                 /* check if key is a numeric value */
 			{
 				/* try operator[] */
 				lua_pushstring(L,".seti");
@@ -281,22 +304,26 @@ static int class_newindex_event (lua_State* L)
 			}
 			else
 			{
-				lua_pushstring(L,".arrow");			/* stack: obj key v mt '.arrow' */
-				lua_rawget(L,-2);                   /* stack: obj key v mt arrow_fn/nil */
-				if (lua_iscfunction(L,-1))			
+				if (!followedArrow) 
 				{
-					lua_remove(L,-2);               /* stack: obj key v arrow_fn/nil */
-					lua_pushvalue(L,1);				/* stack: obj key v arrow_fn/nil obj */
-					lua_call(L,1,1);				/* stack: obj key v newobj */
-					if (lua_isuserdata(L,-1))
+					followedArrow = 1; // Only test for the arrow the first time through
+					lua_pushstring(L,".arrow");			/* stack: obj key v mt '.arrow' */
+					lua_rawget(L,-2);                   /* stack: obj key v mt arrow_fn/nil */
+					if (lua_iscfunction(L,-1))			
 					{
-						lua_remove(L,1);				/* stack: key v newobj */
-						lua_insert(L,1);				/* stack: newobj key v */
-						lua_getmetatable(L,1);			/* stack: newobj key v mt */
-						continue;
+						lua_remove(L,-2);               /* stack: obj key v arrow_fn */
+						lua_pushvalue(L,1);				/* stack: obj key v arrow_fn obj */
+						lua_call(L,1,1);				/* stack: obj key v newobj */
+						if (lua_isuserdata(L,-1))
+						{
+							lua_remove(L,1);				/* stack: key v newobj */
+							lua_insert(L,1);				/* stack: newobj key v */
+							lua_getmetatable(L,1);			/* stack: newobj key v mt */
+							continue;
+						}
 					}
+					lua_pop(L,1);                           /* stack: t k v mt */
 				}
-				lua_pop(L,1);                           /* stack: t k v mt */
 
 				lua_pushstring(L,".set");
 				lua_rawget(L,-2);                      /* stack: t k v mt tset */
