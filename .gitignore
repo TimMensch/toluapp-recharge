@@ -2,3 +2,4 @@ withLua51_*
 ipch
 *.user
 *.sdf
+*.suo
