@@ -368,7 +368,10 @@ TOLUA_API int tolua_default_collect (lua_State* tolua_S)
 TOLUA_API int tolua_register_gc (lua_State* L, int lo)
 {
  int success = 1;
- void *value = *(void **)lua_touserdata(L,lo);
+ void * userdata = lua_touserdata(L,lo);
+ void * value;
+ if (!userdata) return 0;
+ value = *(void **)userdata;
  lua_pushstring(L,"tolua_gc");
  lua_rawget(L,LUA_REGISTRYINDEX);
 	lua_pushlightuserdata(L,value);
