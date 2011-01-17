@@ -89,6 +89,41 @@ class shared_ptr // the name MUST match to trigger my hack<br/>
     or create it. And with this patch, Lua should never be handed a raw pointer to one of the classes you pass to the above template, 
     or it will fail.</p>
 
+    <p>Something you must do in order for this patch to work correctly is to bind an instance of the Lua object to the C++ object
+    directly. Here's an example of how I do this:</p>
+    <code style='white-space:pre;'>
+// called with a shared_ptr&lt;qcGameObject&gt; "this" pointer (objptr) on the Lua stack
+int qcGameObject::bind( lua_State* L ) // stack: objptr
+{
+    lua_getmetatable(L,-1);      // stack: objptr mt
+    lua_getfield(L,-1,".arrow"); // stack: objptr mt .arrow
+    lua_pushvalue(L,1);          // stack: objptr mt .arrow objptr
+    lua_pcall(L,1,1,0);          // stack: objptr mt obj
+    m_scriptObject.bind(L);      // and eat it -- stack: objptr mt
+    lua_pop(L,1);                // pop metatable -- stack: objptr
+    return 0;
+}
+    </code>
+    
+    <p>The above code is then bound to Lua using the following line in the tolua++ package file
+    (as part of the qcGameObject definition):</p>
+    
+    <code>int bind(lua_State* L);</code>
+
+    <p>...and after an object is created in Lua, I call obj:bind(). The m_scriptObject is an object that 
+    can grab a Lua value from the top of the Lua stack and bind it by adding it to the Lua registry. 
+    The important part of the bind() code looks like this:</p>
+
+    <code>
+	lua_pushlightuserdata(L,this);	// stack: objecttobind this<br/>
+	lua_insert(L,-2); // stack: this objecttobind<br/>
+	lua_rawset(m_state,LUA_REGISTRYINDEX); // stack: [empty]<br/>
+    </code>
+
+    <p>And when m_scriptObject is destroyed, it erases its lightuserdata entry from the registry, 
+    releasing the object. This is important if you want your objects to be able to have values bound 
+    to them in Lua.</p>
+
     <p>As one more minor feature of this patch, there's a shell script in the main folder that will regenerate the tolua++ sources
     from the included Lua files; in other words you'll be able to rebuild without installing SCons, which gave me no end of pain.</p>
 
