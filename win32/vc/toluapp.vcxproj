@@ -171,6 +171,32 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\lib\tolua_event.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\bin\lua\all.lua" />
+    <None Include="..\..\src\bin\lua\array.lua" />
+    <None Include="..\..\src\bin\lua\basic.lua" />
+    <None Include="..\..\src\bin\lua\class.lua" />
+    <None Include="..\..\src\bin\lua\clean.lua" />
+    <None Include="..\..\src\bin\lua\code.lua" />
+    <None Include="..\..\src\bin\lua\compat-5.1.lua" />
+    <None Include="..\..\src\bin\lua\compat.lua" />
+    <None Include="..\..\src\bin\lua\container.lua" />
+    <None Include="..\..\src\bin\lua\custom.lua" />
+    <None Include="..\..\src\bin\lua\declaration.lua" />
+    <None Include="..\..\src\bin\lua\define.lua" />
+    <None Include="..\..\src\bin\lua\doit.lua" />
+    <None Include="..\..\src\bin\lua\enumerate.lua" />
+    <None Include="..\..\src\bin\lua\feature.lua" />
+    <None Include="..\..\src\bin\lua\function.lua" />
+    <None Include="..\..\src\bin\lua\module.lua" />
+    <None Include="..\..\src\bin\lua\namespace.lua" />
+    <None Include="..\..\src\bin\lua\operator.lua" />
+    <None Include="..\..\src\bin\lua\package.lua" />
+    <None Include="..\..\src\bin\lua\template_class.lua" />
+    <None Include="..\..\src\bin\lua\typedef.lua" />
+    <None Include="..\..\src\bin\lua\variable.lua" />
+    <None Include="..\..\src\bin\lua\verbatim.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

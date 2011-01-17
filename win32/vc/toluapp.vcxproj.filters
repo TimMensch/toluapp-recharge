@@ -34,4 +34,78 @@
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\bin\lua\all.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\array.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\basic.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\class.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\clean.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\code.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\compat.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\compat-5.1.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\container.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\custom.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\declaration.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\define.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\doit.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\enumerate.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\feature.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\function.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\module.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\namespace.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\operator.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\package.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\template_class.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\typedef.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\variable.lua">
+      <Filter>source</Filter>
+    </None>
+    <None Include="..\..\src\bin\lua\verbatim.lua">
+      <Filter>source</Filter>
+    </None>
+  </ItemGroup>
 </Project>
