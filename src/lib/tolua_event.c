@@ -25,6 +25,13 @@ static void storeatubox (lua_State* L, int lo)
 	#ifdef LUA_VERSION_NUM
 		lua_getfenv(L, lo);
 		if (lua_rawequal(L, -1, TOLUA_NOPEER)) {
+/*			lua_pushvalue(L,-3);
+			lua_setglobal(L,"temptoprinta");
+			lua_pushvalue(L,-2);
+			lua_setglobal(L,"temptoprintb");
+			luaL_dostring(L,"print( 'storeatubox '..dump(temptoprinta)..'='..dump(temptoprintb) )");
+
+			luaL_dostring(L,"print( 'creating new peer table [storeatubox]' )");*/
 			lua_pop(L, 1);
 			lua_newtable(L);
 			lua_pushvalue(L, -1);
@@ -53,6 +60,12 @@ static void storeatubox (lua_State* L, int lo)
 		lua_pop(L,1);                           /* pop ubox[u] */
 	#endif
 }
+
+void tolua_storeatubox (lua_State* L, int lo)
+{
+	storeatubox(L,lo);
+}
+
 
 /* Module index function
 */

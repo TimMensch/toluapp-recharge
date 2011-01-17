@@ -121,6 +121,7 @@ TOLUA_API void tolua_pushfieldusertype_and_takeownership (lua_State* L, int lo, 
 TOLUA_API lua_Number tolua_tonumber (lua_State* L, int narg, lua_Number def);
 TOLUA_API const char* tolua_tostring (lua_State* L, int narg, const char* def);
 TOLUA_API void* tolua_touserdata (lua_State* L, int narg, void* def);
+TOLUA_API void tolua_storeatubox (lua_State* L, int lo);
 TOLUA_API void* tolua_tousertype (lua_State* L, int narg, void* def);
 TOLUA_API int tolua_tovalue (lua_State* L, int narg, int def);
 TOLUA_API int tolua_toboolean (lua_State* L, int narg, int def);

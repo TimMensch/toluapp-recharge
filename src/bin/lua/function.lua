@@ -257,7 +257,7 @@ function classFunction:supcode (local_constructor)
    if t and self.name ~= "new" then
    	if self.cast_operator and _basic_raw_push[t] then
 		output('   ',_basic_raw_push[t],'(tolua_S,(',ct,')tolua_ret);')
-   	else
+	else
 	    output('   tolua_push'..t..'(tolua_S,(',ct,')tolua_ret);')
 	end
    else
@@ -267,23 +267,41 @@ function classFunction:supcode (local_constructor)
 	if string.find(self.mod, "tolua_owned") then
 		owned = true
 	end
+	if self.name=='new' then
+		owned = true
+	end
+
     local push_func = get_push_function(t)
     if self.ptr == '' then
      output('   {')
-     output('#ifdef __cplusplus\n')
-     output('    void* tolua_obj = Mtolua_new((',new_t,')(tolua_ret));')
+     output('    ',new_t,'* tolua_obj = (',new_t,'*)Mtolua_new((',new_t,')(tolua_ret));')
      output('    ',push_func,'(tolua_S,tolua_obj,"',t,'");')
      output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
-     output('#else\n')
-     output('    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(',t,'));')
-     output('    ',push_func,'(tolua_S,tolua_obj,"',t,'");')
-     output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
-     output('#endif\n')
+
+	 if new_t:find('shared_ptr') then
+		local insideType = t:gsub("shared_ptr<([^ ]*)[ ]*>","%1")
+		 local push_func = get_push_function(insideType)
+		 output('    if (tolua_obj)')
+		 output('    {')
+		 output('        lua_pushstring(tolua_S,"__this");')
+		 output('       ',push_func,'(tolua_S,tolua_obj->get(),"',insideType,'");')
+		 output('        tolua_storeatubox(tolua_S,-3);')
+		 output('    }')
+	 end
+		
      output('   }')
     elseif self.ptr == '&' then
      output('   ',push_func,'(tolua_S,(void*)&tolua_ret,"',t,'");')
-    else
-	 output('   ',push_func,'(tolua_S,(void*)tolua_ret,"',t,'");')
+	else
+	 output('   ',push_func,'(tolua_S,(void * )tolua_ret,"',t,'");')
+		-- this is in the wrong place!
+--[[		if class:find('shared_ptr<') then
+			output('   lua_pushlightuserdata(tolua_S,tolua_ret);//wrong place );')
+			output('   lua_pushvalue(tolua_S,-2);')
+			output('   tolua_storeatubox(tolua_S,1);')
+		end--]]
+
+
 	 if owned or local_constructor then
       output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
 	 end
