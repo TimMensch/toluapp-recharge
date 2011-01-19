@@ -277,18 +277,6 @@ function classFunction:supcode (local_constructor)
      output('    ',new_t,'* tolua_obj = (',new_t,'*)Mtolua_new((',new_t,')(tolua_ret));')
      output('    ',push_func,'(tolua_S,tolua_obj,"',t,'");')
      output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
-
-	 if new_t:find('shared_ptr') then
-		local insideType = t:gsub("shared_ptr<([^ ]*)[ ]*>","%1")
-		 local push_func = get_push_function(insideType)
-		 output('    if (tolua_obj)')
-		 output('    {')
-		 output('        lua_pushstring(tolua_S,"__this");')
-		 output('       ',push_func,'(tolua_S,tolua_obj->get(),"',insideType,'");')
-		 output('        tolua_storeatubox(tolua_S,-3);')
-		 output('    }')
-	 end
-		
      output('   }')
     elseif self.ptr == '&' then
      output('   ',push_func,'(tolua_S,(void*)&tolua_ret,"',t,'");')
