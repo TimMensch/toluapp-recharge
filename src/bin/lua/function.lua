@@ -280,16 +280,8 @@ function classFunction:supcode (local_constructor)
      output('   }')
     elseif self.ptr == '&' then
      output('   ',push_func,'(tolua_S,(void*)&tolua_ret,"',t,'");')
-	else
-	 output('   ',push_func,'(tolua_S,(void * )tolua_ret,"',t,'");')
-		-- this is in the wrong place!
---[[		if class:find('shared_ptr<') then
-			output('   lua_pushlightuserdata(tolua_S,tolua_ret);//wrong place );')
-			output('   lua_pushvalue(tolua_S,-2);')
-			output('   tolua_storeatubox(tolua_S,1);')
-		end--]]
-
-
+    else
+	 output('   ',push_func,'(tolua_S,(void*)tolua_ret,"',t,'");')
 	 if owned or local_constructor then
       output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
 	 end

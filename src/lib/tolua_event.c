@@ -228,6 +228,13 @@ static int class_index_event (lua_State* L)
 							lua_pushvalue(L,1);				/* stack: newobj key newobj */
 							continue;
 						}
+						// it SHOULDN'T ever hit this code; if there's a .arrow,
+						// it should return a function that returns the real object,
+						// but if it gets here, then handle it correctly:
+						// stack: obj key nil
+						lua_pop(L,1);                   /* stack: obj key */
+						lua_pushvalue(L,1);				/* stack: obj key obj */
+						continue;						
 					}
 					lua_pop(L,1);                           /* stack: t k v mt */
 				}
@@ -326,7 +333,7 @@ static int class_newindex_event (lua_State* L)
 					{
 						lua_remove(L,-2);               /* stack: obj key v arrow_fn */
 						lua_pushvalue(L,1);				/* stack: obj key v arrow_fn obj */
-						lua_call(L,1,1);				/* stack: obj key v newobj */
+						lua_call(L,1,1);				/* stack: obj key v newobj/nil */
 						if (lua_isuserdata(L,-1))
 						{
 							lua_remove(L,1);				/* stack: key v newobj */
@@ -334,6 +341,13 @@ static int class_newindex_event (lua_State* L)
 							lua_getmetatable(L,1);			/* stack: newobj key v mt */
 							continue;
 						}
+						// it SHOULDN'T ever hit this code; if there's a .arrow,
+						// it should return a function that returns the real object,
+						// but if it gets here, then handle it correctly:
+						// stack: obj key nil
+						lua_pop(L,1);                   /* stack: obj key v */
+						lua_getmetatable(L,1);			/* stack: obj key v mt */
+						continue;						
 					}
 					lua_pop(L,1);                           /* stack: t k v mt */
 				}

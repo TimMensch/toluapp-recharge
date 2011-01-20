@@ -18,9 +18,6 @@ local function pp_dofile(path)
 			end
 			
 			local ret = file:read("*a")
-
-			size = file:seek("end",0);
-
 			file:close()
 
 			ret = string.gsub(ret, "%.%.%.%s*%)", "...) local arg = {n=select('#', ...), ...};")
