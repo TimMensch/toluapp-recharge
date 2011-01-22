@@ -47,6 +47,7 @@ function doit ()
 	if not flags['S'] then
 		_basic['string'] = 'cppstring'
 		_basic['std::string'] = 'cppstring'
+		_basic['qc::string'] = 'cppstring'
 		_basic_ctype.cppstring = 'const char*'
 	end
 
