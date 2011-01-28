@@ -69,7 +69,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='withLua51_Release|Win32'">..\..\..\..\..\..\tools\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='withLua51_Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='withLua51_Release|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='withLua51_Release|Win32'">..\..\..\..\..\lua-5.1.4\src;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='withLua51_Release|Win32'">..\..\..\..\..\lua\5.1.4\lua\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='withLua50_Debug|Win32'">
     <ClCompile>
