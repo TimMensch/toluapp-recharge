@@ -275,16 +275,25 @@ function classDeclaration:builddeclaration (narg, cplusplus)
   	--print("t is "..tostring(t)..", ptr is "..tostring(self.ptr))
   	if t == 'number' and string.find(self.ptr, "%*") then
   		t = 'userdata'
-  	end
-	if not t and ptr=='' then line = concatparam(line,'*') end
-	line = concatparam(line,'((',self.mod,type)
-	if not t then
-		line = concatparam(line,'*')
 	end
-	line = concatparam(line,') ')
-	if isenum(nctype) then
-		line = concatparam(line,'(int) ')
+
+
+	if _no_new[type] then
+		line = line .. '('
+	else
+
+		if not t and ptr=='' then line = concatparam(line,'*') end
+		line = concatparam(line,'((',self.mod,type)
+		if not t then
+			line = concatparam(line,'*')
+		end
+		line = concatparam(line,') ')
+		if isenum(nctype) then
+			line = concatparam(line,'(int) ')
+		end
+
 	end
+
 	local def = 0
 	if self.def ~= '' then
 		def = self.def
@@ -292,6 +301,7 @@ function classDeclaration:builddeclaration (narg, cplusplus)
 			def = "(void*)&(const "..type..")"..def
 		end
 	end
+
 	if t then
 		line = concatparam(line,'tolua_to'..t,'(tolua_S,',narg,',',def,'));')
 	else
