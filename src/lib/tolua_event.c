@@ -204,8 +204,9 @@ static int class_index_event (lua_State* L)
 					lua_call(L,2,1);
 					return 1;
 				}
+				lua_pop(L,1); // obj key mt
 			}
-			else
+//			else
 			{
 				if (!followedArrow)
 				{
@@ -238,7 +239,6 @@ static int class_index_event (lua_State* L)
 					}
 					lua_pop(L,1);                           /* stack: t k v mt */
 				}
-
 				lua_pushvalue(L,2);                    /* stack: obj key mt key */
 				lua_rawget(L,-2);                      /* stack: obj key mt value */
 				if (!lua_isnil(L,-1))

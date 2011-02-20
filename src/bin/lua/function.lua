@@ -86,6 +86,12 @@ function classFunction:supcode (local_constructor)
 	end
 	output(' tolua_Error tolua_err;')
  output(' if (\n')
+
+	local is_operator = false
+	if self.name then
+	  is_operator = self.name:find("^operator[^-]")
+	end
+
  -- check self
  local narg
  if class then narg=2 else narg=1 end
@@ -100,7 +106,7 @@ function classFunction:supcode (local_constructor)
 		if self.const ~= '' then
 			type = "const "..type
 		end
-		if _shared_ptr[class] and not static then
+		if _shared_ptr[class] and (not static) and (not is_operator) then
 			output('     !'..func..'(tolua_S,1,"shared_ptr<'..stripped_type..'>",0,&tolua_err) ||\n')
 		else
 			output('     !'..func..'(tolua_S,1,"'..stripped_type..'",0,&tolua_err) ||\n')
@@ -136,7 +142,7 @@ function classFunction:supcode (local_constructor)
  if class then narg=2 else narg=1 end
  if class and self.name~='new' and static==nil then
 
-	if _shared_ptr[class] then
+	if _shared_ptr[class] and (not is_operator) then
 		output(' ',self.const,self.parent.type,'*','self = ')
 
 		output('( *( shared_ptr<',self.const,self.parent.type,'> *) ')
