@@ -231,10 +231,12 @@ function classDeclaration:outchecktype (narg)
 	return '!tolua_is'..t..'(tolua_S,'..narg..','..def..',&tolua_err)'
  else
   local is_func = get_is_function(self.type)
+	 local stripped_type = self.type:gsub('> >','>>')
+
   if self.ptr == '&' or self.ptr == '' then
-  	return '(tolua_isvaluenil(tolua_S,'..narg..',&tolua_err) || !'..is_func..'(tolua_S,'..narg..',"'..self.type..'",'..def..',&tolua_err))'
+  	return '(tolua_isvaluenil(tolua_S,'..narg..',&tolua_err) || !'..is_func..'(tolua_S,'..narg..',"'..stripped_type..'",'..def..',&tolua_err))'
   else
-	return '!'..is_func..'(tolua_S,'..narg..',"'..self.type..'",'..def..',&tolua_err)'
+	return '!'..is_func..'(tolua_S,'..narg..',"'..stripped_type..'",'..def..',&tolua_err)'
   end
  end
 end

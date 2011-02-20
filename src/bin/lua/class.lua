@@ -37,14 +37,15 @@ function classClass:register (pre)
 
  pre = pre or ''
  push(self)
+	local stripped_type = self.type:gsub("> >",">>")
 	if _collect[self.type] then
 		output(pre,'#ifdef __cplusplus\n')
-  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..self.type..'","'..self.btype..'",'.._collect[self.type]..');')
+  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..stripped_type..'","'..self.btype..'",'.._collect[self.type]..');')
 		output(pre,'#else\n')
-  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..self.type..'","'..self.btype..'",NULL);')
+  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..stripped_type..'","'..self.btype..'",NULL);')
 		output(pre,'#endif\n')
 	else
-  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..self.type..'","'..self.btype..'",NULL);')
+  output(pre..'tolua_cclass(tolua_S,"'..self.lname..'","'..stripped_type..'","'..self.btype..'",NULL);')
 	end
 	if self.extra_bases then
 		for k,base in ipairs(self.extra_bases) do

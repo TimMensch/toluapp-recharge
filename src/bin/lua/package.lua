@@ -154,7 +154,8 @@ function classPackage:preamble ()
 	end
 	foreach(_usertype,function(n,v)
 		if (not _global_classes[v]) or _global_classes[v]:check_public_access() then
-			output(' tolua_usertype(tolua_S,"',v,'");')
+			local stripped_v = v:gsub("> >",">>")
+			output(' tolua_usertype(tolua_S,"',stripped_v,'");')
 			if flags.t then
 				output(' Mtolua_typeid(tolua_S,typeid(',v,'), "',v,'");')
 			end

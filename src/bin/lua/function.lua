@@ -90,8 +90,9 @@ function classFunction:supcode (local_constructor)
  local narg
  if class then narg=2 else narg=1 end
  if class then
-		local func = get_is_function(self.parent.type)
-		local type = self.parent.type
+	 local type = self.parent.type
+	 local stripped_type = type:gsub('> >','>>')
+		local func = get_is_function(stripped_type)
 		if self.name=='new' or static~=nil then
 			func = 'tolua_isusertable'
 			type = self.parent.type
@@ -100,9 +101,9 @@ function classFunction:supcode (local_constructor)
 			type = "const "..type
 		end
 		if _shared_ptr[class] and not static then
-			output('     !'..func..'(tolua_S,1,"shared_ptr<'..type..'>",0,&tolua_err) ||\n')
+			output('     !'..func..'(tolua_S,1,"shared_ptr<'..stripped_type..'>",0,&tolua_err) ||\n')
 		else
-			output('     !'..func..'(tolua_S,1,"'..type..'",0,&tolua_err) ||\n')
+			output('     !'..func..'(tolua_S,1,"'..stripped_type..'",0,&tolua_err) ||\n')
 		end
 
  end
@@ -273,9 +274,10 @@ function classFunction:supcode (local_constructor)
 
     local push_func = get_push_function(t)
     if self.ptr == '' then
+	 local stripped_t = t:gsub('> >','>>')
      output('   {')
      output('    ',new_t,'* tolua_obj = (',new_t,'*)Mtolua_new((',new_t,')(tolua_ret));')
-     output('    ',push_func,'(tolua_S,tolua_obj,"',t,'");')
+     output('    ',push_func,'(tolua_S,tolua_obj,"',stripped_t,'");')
      output('    tolua_register_gc(tolua_S,lua_gettop(tolua_S));')
      output('   }')
     elseif self.ptr == '&' then

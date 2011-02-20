@@ -54,6 +54,8 @@ function classTemplateClass:throw(types, local_scope)
 
 		if n:find("shared_ptr") then
 			_shared_ptr[Il[1]] = true
+			local stripped_type = Il[1]:gsub('> >','>>')
+			_shared_ptr[stripped_type] = true -- also flag without '> >'
 		end
 
 	end
